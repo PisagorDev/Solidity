@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./utils/Access/Access.sol"
+import "../utils/access/Access.sol";
 
 /*
    --> @title Token Presale Contract <--
