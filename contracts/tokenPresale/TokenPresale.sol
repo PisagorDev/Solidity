@@ -7,8 +7,8 @@ import "../utils/access/Access.sol";
 
 /*
    --> @title Token Presale Contract <--
-    This contract allows you to sell the 
-    token you want for the token you want.
+    This contract allows you to sell 
+    the token for the token you want in exchange.
 */
 
 contract TokenSale is Access{
@@ -32,23 +32,23 @@ contract TokenSale is Access{
     // Address to which sales revenues are sent
     address payable public SALE_OWNER;
 
-    // An address buy max 10 (1e19) token
+    // An address is allowed to buy max 10 (1e19) token
     uint private MAX_AMOUNT_PER_ADDRESS = 10 ether;
 
     // Token price with main token of chain
     uint private TOKEN_PRICE_FOR_ETHER = 1 ether;
 
-    // Sale'll start for all addresses
+    // Sale will start for all addresses
     uint private SALE_START_TIME_WITH_ETHER_FOR_ALL = 0;
 
-    // Sale'll start for only addresses in whitelist
+    // Sale will start for only addresses in whitelist
     uint private SALE_START_TIME_WITH_ETHER_FOR_WHITELIST = 0;
 
     // How many tokens were sold
     uint public totalSold;
     uint public totalSoldWithEther;
     
-    // How many tokens will sale
+    // How many tokens will be saled
     uint public maxTokenSale;
     uint public maxTokenSaleWithEther;
 
@@ -79,13 +79,13 @@ contract TokenSale is Access{
 
     /* ======== VIEW FUNCTIONS ======== */
 
-    function getUserTotalBoughtAmount(address user) public view returns(uint){
-        require(user != address(0), "User can not be zero address");
+    function getUserTotalPurchased(address user) public view returns(uint){
+        require(user != address(0), "user can not be zero address");
         return totalAmountByUser[user];
     }
 
     function whitelistQuery(address user) public view returns(bool){
-        require(user != address(0), "User can not be zero address");
+        require(user != address(0), "user can not be zero address");
         return inWhiteList[user];
     }
 
@@ -120,7 +120,7 @@ contract TokenSale is Access{
     }
 
     function setTokenInSaleWithEther(uint _amount) external onlyAdmin{
-        require(_amount >= maxTokenSaleWithEther, "_amount can not less than");
+        require(_amount >= maxTokenSaleWithEther, "_amount can not be less than maxTokenSaleWithEther");
         maxTokenSale = maxTokenSale.sub(maxTokenSaleWithEther).add(_amount);
         maxTokenSaleWithEther = _amount;
         emit TokenInSaleWithEtherSet(msg.sender, _amount);
@@ -172,10 +172,10 @@ contract TokenSale is Access{
         uint time = inWhiteList[msg.sender] ? token.whiteListTime : token.allTime;
         uint userTotalAmount = totalAmountByUser[msg.sender];
     
-        require(token.totalSold.add(amount) <= token.maxTokenSale, "Amount is to high");
+        require(token.totalSold.add(amount) <= token.maxTokenSale, "Amount is too high");
         require(block.timestamp >= time, "Sale did not start yet.");
         require(userTotalAmount.add(amount) <= MAX_AMOUNT_PER_ADDRESS, "Can not buy more.");
-        require(_token.balanceOf(msg.sender) >= amount.mul(token.price).div(10**_token.decimals()), "You have enough money.");
+        require(_token.balanceOf(msg.sender) >= amount.mul(token.price).div(10**_token.decimals()), "You do not have enough money.");
 
         totalAmountByUser[msg.sender] = userTotalAmount.add(amount);
 
@@ -192,10 +192,10 @@ contract TokenSale is Access{
         uint time = inWhiteList[msg.sender] ? SALE_START_TIME_WITH_ETHER_FOR_WHITELIST : SALE_START_TIME_WITH_ETHER_FOR_ALL;
         uint userTotalAmount = totalAmountByUser[msg.sender];
 
-        require(totalSoldWithEther.add(amount) <= maxTokenSaleWithEther, "Amount is to high");
+        require(totalSoldWithEther.add(amount) <= maxTokenSaleWithEther, "Amount is too high");
         require(block.timestamp >= time, "Sale did not start yet.");
         require(userTotalAmount.add(amount) <= MAX_AMOUNT_PER_ADDRESS, "Can not buy more.");
-        require(msg.value >= amount.mul(TOKEN_PRICE_FOR_ETHER).div(1e18), "Do not have enough ethers");
+        require(msg.value >= amount.mul(TOKEN_PRICE_FOR_ETHER).div(1e18), "You do not have enough ethers");
         
         SALE_OWNER.transfer(amount.mul(TOKEN_PRICE_FOR_ETHER).div(1e18));
 
